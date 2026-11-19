@@ -1,8 +1,0 @@
-{
-  "name": "site-aline-storffes",
-  "compatibility_date": "2026-11-01",
-  "assets": {
-    "directory": "."
-  },
-  "workers_dev": true
-}
