@@ -294,25 +294,12 @@ footer .legal span{max-width:100%}
 
 /* ===== Entrada (inspirada em philipphafner.com) ===== */
 #intro{position:fixed;inset:0;z-index:100;background:var(--paper);display:grid;place-items:center;pointer-events:auto}
-#intro .name{display:grid;justify-items:center;gap:.35em;font-family:"Hanken Grotesk",sans-serif;font-weight:300;font-size:clamp(1.35rem,3.2vw,2.3rem);letter-spacing:.55em;color:var(--ink);text-transform:uppercase;transform-origin:center;will-change:transform,opacity;padding-left:.55em}
-#intro .row{display:flex}
-#intro .ch{display:inline-block;opacity:0;filter:blur(6px);transform:translateY(.15em);transition:opacity .5s ease,filter .5s ease,transform .5s ease;transition-delay:var(--d,0ms)}
-#intro .sub{display:flex;align-items:center;gap:.9em;margin-top:.9em;font-size:.32em;letter-spacing:.45em;color:var(--muted);opacity:0;transition:opacity .6s ease .95s}
-#intro .sub i{display:block;width:5.5em;height:1px;background:var(--line);transform:scaleX(0);transform-origin:left;transition:transform .7s cubic-bezier(.6,0,.2,1) .85s}
-#intro.on .ch{opacity:1;filter:none;transform:none}
-#intro.on .sub{opacity:1}
-#intro.on .sub i{transform:none}
+/* Entrada: o logo oficial aparece suave e a capa entra em seguida (celular e computador) */
+#intro .logo{display:block;width:min(70vw,17rem);aspect-ratio:327/127;height:auto;color:var(--grey);opacity:0;transform:scale(.97);transition:opacity 1s ease,transform 1.6s cubic-bezier(.2,.7,.2,1)}
+@media (min-width:56rem){#intro .logo{width:min(40vw,26rem)}}
+#intro.on .logo{opacity:1;transform:none}
 #intro.leave{background:transparent;transition:background .5s ease .25s}
-#intro.leave .name{transition:transform .95s cubic-bezier(.7,0,.2,1),opacity .4s ease .7s;opacity:0}
-#intro.leave .sub{opacity:0;transition:opacity .3s ease}
-/* Celular: só o logo oficial aparece, suave, e a capa entra em seguida */
-#intro .logo{display:none}
-@media (max-width:896px){
-  #intro .name{display:none}
-  #intro .logo{display:block;width:min(70vw,17rem);aspect-ratio:327/127;height:auto;color:var(--grey);opacity:0;transform:scale(.97);transition:opacity 1s ease,transform 1.6s cubic-bezier(.2,.7,.2,1)}
-  #intro.on .logo{opacity:1;transform:none}
-  #intro.leave .logo{opacity:0;transition:opacity .45s ease}
-}
+#intro.leave .logo{opacity:0;transition:opacity .45s ease}
 body.entering .top .brand{opacity:0}
 body.entering .top .right{opacity:0}
 body.entered .top .brand,body.entered .top .right{opacity:1;transition:opacity .6s ease}
@@ -373,11 +360,6 @@ footer .biglogo{width:min(100%,17rem)}
 </head>
 <body>
 <div id="intro" aria-hidden="true">
-  <div class="name">
-    <span class="row">ALINE</span>
-    <span class="row">STORFFES</span>
-    <span class="sub"><i></i>ESTÉTICA AVANÇADA</span>
-  </div>
   <svg class="logo" aria-hidden="true"><use href="#logo-c"/></svg>
 </div>
 <noscript><style>#intro{display:none}</style></noscript>
@@ -833,42 +815,21 @@ document.querySelectorAll(".qa").forEach(d => d.addEventListener("toggle", () =>
   });
 })();
 
-/* Entrada: letras aparecem fora de ordem, o nome sobe até o logo e a capa se revela */
+/* Entrada: o logo oficial aparece, some, e a capa se revela */
 (function () {
   const el = document.getElementById("intro");
   if (!el) return;
-  const name = el.querySelector(".name");
-  const mobile = matchMedia("(max-width: 896px)").matches;
-  if (!mobile) el.querySelectorAll(".row").forEach(row => {
-    const letters = [...row.textContent];
-    row.textContent = "";
-    letters.forEach(c => { const s = document.createElement("span"); s.className = "ch"; s.textContent = c; s.style.setProperty("--d", Math.round(Math.random() * 650) + "ms"); row.appendChild(s); });
-  });
   let done = false;
   function finish() {
     if (done) return; done = true;
-    if (mobile) {
-      /* Celular: o logo some e a capa (foto primeiro) aparece */
-      el.classList.add("leave");
-      document.body.classList.add("entered");
-      setTimeout(() => { document.body.classList.remove("entering"); document.documentElement.style.overflow = ""; }, 120);
-      setTimeout(() => el.remove(), 1000);
-      try { sessionStorage.setItem("intro-vista", "1"); } catch (e) {}
-      return;
-    }
-    const target = document.querySelector(innerWidth >= 896 ? ".top .brand .w" : ".top .brand .m");
-    const t = target.getBoundingClientRect(), n = name.getBoundingClientRect();
-    const sc = Math.max(.12, Math.min(.6, t.width / n.width));
-    const dx = (t.left + t.width / 2) - (n.left + n.width / 2), dy = (t.top + t.height / 2) - (n.top + n.height / 2);
     el.classList.add("leave");
-    name.style.transform = `translate(${dx}px, ${dy}px) scale(${sc})`;
     document.body.classList.add("entered");
     setTimeout(() => { document.body.classList.remove("entering"); document.documentElement.style.overflow = ""; }, 120);
-    setTimeout(() => el.remove(), 1300);
+    setTimeout(() => el.remove(), 1000);
     try { sessionStorage.setItem("intro-vista", "1"); } catch (e) {}
   }
   requestAnimationFrame(() => requestAnimationFrame(() => el.classList.add("on")));
-  const timer = setTimeout(finish, mobile ? 2000 : 2300);
+  const timer = setTimeout(finish, 2000);
   ["click", "keydown", "wheel", "touchstart"].forEach(ev => addEventListener(ev, () => { clearTimeout(timer); finish(); }, { once: true, passive: true }));
 })();
 
